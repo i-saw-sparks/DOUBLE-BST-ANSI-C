@@ -70,30 +70,30 @@ item_node *insertItemNodeAux(item_node *self, const char *name, int count) {
         if (strcmp(name, self->name) < 0) {
             self->left = insertItemNodeAux(self->left, name, count);
         } else {
-            self->right=insertItemNodeAux(self->right, name, count);
+            self->right = insertItemNodeAux(self->right, name, count);
         }
     }
     return self;
 }
 
-tree_name_node *search_for_name_node(tree_name_node* node, const char* name) {
-    if(node == NULL){
+tree_name_node *search_for_name_node(tree_name_node *node, const char *name) {
+    if (node == NULL) {
         return NULL;
-    }else{
+    } else {
         int n = strlen(name);
-        if(strncmp(node->treeName, name, n) == 0){
+        if (strncmp(node->treeName, name, n) == 0) {
             return node;
-        }else{
-            if(strcmp(name, node->treeName) < 0){
-                if(node->left == NULL){
+        } else {
+            if (strcmp(name, node->treeName) < 0) {
+                if (node->left == NULL) {
                     return NULL;
-                }else{
+                } else {
                     return search_for_name_node(node->left, name);
                 }
-            }else{
-                if(node->right == NULL){
+            } else {
+                if (node->right == NULL) {
                     return NULL;
-                }else{
+                } else {
                     return search_for_name_node(node->right, name);
                 }
             }
@@ -101,7 +101,7 @@ tree_name_node *search_for_name_node(tree_name_node* node, const char* name) {
     }
 }
 
-item_node *search_in_name_node(tree_name_node *subTree, const char* name) {
+item_node *search_in_name_node(tree_name_node *subTree, const char *name) {
     if (subTree == NULL) {
         return NULL;
     }
@@ -109,23 +109,23 @@ item_node *search_in_name_node(tree_name_node *subTree, const char* name) {
 }
 
 item_node *searchItemAux(item_node *node, const char *name) {
-    if(node == NULL){
+    if (node == NULL) {
         return NULL;
-    }else{
+    } else {
         int n = strlen(name);
-        if(strncmp(node->name, name, n) == 0){
+        if (strncmp(node->name, name, n) == 0) {
             return node;
-        }else{
-            if(strcmp(name, node->name) < 0){
-                if(node->left == NULL){
+        } else {
+            if (strcmp(name, node->name) < 0) {
+                if (node->left == NULL) {
                     return NULL;
-                }else{
+                } else {
                     return searchItemAux(node->left, name);
                 }
-            }else{
-                if(node->right == NULL){
+            } else {
+                if (node->right == NULL) {
                     return NULL;
-                }else{
+                } else {
                     return searchItemAux(node->right, name);
                 }
             }
@@ -134,21 +134,21 @@ item_node *searchItemAux(item_node *node, const char *name) {
 }
 
 int getItemCountBefore(tree_name_node *tree, item_node *node) {
-    if(tree == NULL || node == NULL){
+    if (tree == NULL || node == NULL) {
         return -1;
-    }else{
+    } else {
         return getItemCountBeforeAux(tree->theTree, node);
     }
 }
 
 int getItemCountBeforeAux(item_node *self, item_node *node) {
     int count = 0;
-    if(self == node || self == NULL){
+    if (self == node || self == NULL) {
         return count;
-    }else{
-        count ++;
+    } else {
+        count++;
         count += getItemCountBeforeAux(self->left, node);
-        if(searchItemAux(self->left, node) == NULL)
+        if (searchItemAux(self->left, node) == NULL)
             count += getItemCountBeforeAux(self->right, node);
 
         return count;
@@ -156,14 +156,14 @@ int getItemCountBeforeAux(item_node *self, item_node *node) {
 }
 
 int getHeight(item_node *node) {
-    if(node == NULL){
+    if (node == NULL) {
         return -1;
     }
 
     int leftHeight = getHeight(node->left);
     int rightHeight = getHeight(node->right);
 
-    return (leftHeight > rightHeight ? leftHeight:rightHeight)+1;
+    return (leftHeight > rightHeight ? leftHeight : rightHeight) + 1;
 }
 
 int getRightHeight(tree_name_node *tree) {
@@ -178,10 +178,10 @@ int getCount(tree_name_node *tree) {
     return getCountAux(tree->theTree);
 }
 
-int getCountAux(item_node *node){
-    if(node == NULL){
+int getCountAux(item_node *node) {
+    if (node == NULL) {
         return 0;
-    }else{
+    } else {
         int count = node->count;
         count += getCountAux(node->left);
         count += getCountAux(node->right);
@@ -190,26 +190,31 @@ int getCountAux(item_node *node){
     }
 }
 
-void deleteItemNode(tree_name_node* tree, item_node *node) {
+void deleteItemNode(tree_name_node *tree, item_node *node) {
     item_node *aux;
-    if(node == NULL){
+    if (node == NULL || tree == NULL) {
         return;
     }
-    if(is_leaf(node)){
-        item_node* bef = get_node_before(tree->theTree, node);
-        if(bef ->right == node){
-            bef->right = NULL;
-        }else{
-            bef->left = NULL;
+    if (item_is_leaf(node)) {
+        item_node *bef = get_item_before(tree->theTree, node);
+        if (bef == NULL) {
+            tree->theTree = NULL;
+        } else {
+            if (bef->right == node) {
+                bef->right = NULL;
+            } else {
+                bef->left = NULL;
+            }
         }
+        node = NULL;
         free(node);
-    }else{
-        if(node -> left != NULL){
+    } else {
+        if (node->left != NULL) {
             aux = get_highest(node->left);
             node->count = aux->count;
             strcpy(node->name, aux->name);
             deleteItemNode(tree, get_highest(node->left));
-        }else{
+        } else {
             aux = get_lowest(node->right);
             node->count = aux->count;
             strcpy(node->name, aux->name);
@@ -219,42 +224,141 @@ void deleteItemNode(tree_name_node* tree, item_node *node) {
     }
 }
 
-int is_leaf(item_node *node) {
-    return node->right == NULL && node ->left == NULL ? 1:0;
+int item_is_leaf(item_node *node) {
+    return node->right == NULL && node->left == NULL ? 1 : 0;
+}
+
+int tree_node_is_leaf(tree_name_node *node) {
+    return node->right == NULL && node->left == NULL ? 1 : 0;
 }
 
 item_node *get_highest(item_node *node) {
-    if(node == NULL || node ->right == NULL){
+    if (node == NULL || node->right == NULL) {
         return node;
     }
 
     return get_highest(node->right);
 }
 
+tree_name_node *get_highest_tree(tree_name_node *tree) {
+    if (tree == NULL || tree->right == NULL) {
+        return tree;
+    }
+
+    return get_highest_tree(tree->right);
+}
+
 item_node *get_lowest(item_node *node) {
-    if(node == NULL || node ->left == NULL){
+    if (node == NULL || node->left == NULL) {
         return node;
     }
 
     return get_lowest(node->left);
 }
 
-item_node *get_node_before(item_node *root, item_node *node) {
-    if(node == NULL || node == root){
-        return NULL;
-    }else{
-        if(root ->left == node || root->right == node){
-            return root;
-        }else{
-           if(strcmp(node->name, root->name) < 0){
-               return get_node_before(root->left, node);
-           }else{
-               return get_node_before(root->right, node);
-           }
-        }
+tree_name_node *get_lowest_tree(tree_name_node *tree) {
+    if (tree == NULL || tree->left == NULL) {
+        return tree;
     }
 
+    return get_lowest_tree(tree->left);
 }
+
+item_node *get_item_before(item_node *root, item_node *node) {
+    if (node == NULL || strcmp(node->name, root->name) == 0) {
+        return NULL;
+    } else {
+        if (root->left == node || root->right == node) {
+            return root;
+        } else {
+            if (strcmp(node->name, root->name) < 0) {
+                return get_item_before(root->left, node);
+            } else {
+                return get_item_before(root->right, node);
+            }
+        }
+    }
+}
+
+tree_name_node *get_tree_before(tree_name_node *root, tree_name_node *node) {
+    if (node == NULL || node == root) {
+        return NULL;
+    } else {
+        if (root->left == node || root->right == node) {
+            return root;
+        } else {
+            if (strcmp(node->treeName, root->treeName) < 0) {
+                return get_tree_before(root->left, node);
+            } else {
+                return get_tree_before(root->right, node);
+            }
+        }
+    }
+}
+
+void deleteTreeNameNode(tree_name_node *tree, tree_name_node *node) {
+
+    tree_name_node *aux;
+    if (node == NULL) {
+        return;
+    }
+    if (tree_node_is_leaf(node)) {
+
+        tree_name_node *bef = get_tree_before(tree, node);
+        if (bef != NULL) {
+            if (bef->right == node) {
+                bef->right = NULL;
+            } else {
+                bef->left = NULL;
+            }
+        }
+
+
+        while (node->theTree != NULL) {
+            deleteItemNode(node, node->theTree);
+        }
+
+        free(node);
+
+    } else {
+        if (node->left != NULL) {
+            aux = get_highest_tree(node->left);
+            node->theTree = aux->theTree;
+            strcpy(node->treeName, aux->treeName);
+            deleteTreeNameNode(tree, get_highest_tree(node->left));
+        } else {
+            aux = get_lowest_tree(node->right);
+            item_node *temp;
+            temp = node->theTree;
+            node->theTree = aux->theTree;
+            aux->theTree = temp;
+            strcpy(node->treeName, aux->treeName);
+            deleteTreeNameNode(tree, get_lowest_tree(node->right));
+        }
+    }
+}
+
+void deleteAll(tree_name_node *root_tree) {
+    for(int i =0; i < getTreeCount(root_tree); i++){
+        deleteTreeNameNode(root_tree, root_tree);
+    }
+}
+
+int getTreeCount(tree_name_node *tree) {
+    if (tree == NULL) {
+        return 0;
+    } else {
+        int count = 1;
+        count += getCountAux(tree->left);
+        count += getCountAux(tree->right);
+
+        return count;
+    }
+}
+
+
+
+
 
 
 

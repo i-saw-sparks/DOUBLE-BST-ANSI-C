@@ -41,6 +41,7 @@ int main() {
             executeCommand(tree, treeName, itemName, cmd);
         }
     }
+    deleteAll(tree);
     fclose(fptr);
 }
 
@@ -112,6 +113,15 @@ void executeCommand(tree_name_node *root, char* treeName, char* itemName, char*c
         }else {
             fputs(treeName, stdout);
             printf(" count %d\n", getCount(tree));
+        }
+    }else if(strncmp(cmd, "delete_tree", 11) == 0){
+        tree_name_node* tree = search_for_name_node(root, treeName);
+        if(tree == NULL){
+            printTreeNotFound(treeName);
+        }else {
+            deleteTreeNameNode(root, tree);
+            fputs(treeName, stdout);
+            fputs(" deleted\n", stdout);
         }
     }else if(strncmp(cmd, "delete", 6) == 0){
         tree_name_node* tree = search_for_name_node(root, treeName);

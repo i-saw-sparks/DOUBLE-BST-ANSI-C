@@ -41,15 +41,22 @@ int getRightHeight(tree_name_node*);
 int getLeftHeight(tree_name_node*);
 int getHeight(item_node*);
 int getCount(tree_name_node*);
+int getTreeCount(tree_name_node*);
 int getCountAux(item_node*);
-item_node *get_node_before(item_node*, item_node*);
+item_node *get_item_before(item_node*, item_node*);
+tree_name_node *get_tree_before(tree_name_node* , tree_name_node*);
 
-int is_leaf(item_node*);
+int item_is_leaf(item_node*);
+int tree_node_is_leaf(tree_name_node *);
+
 item_node* get_highest(item_node*);
 item_node* get_lowest(item_node*);
 
+tree_name_node * get_highest_tree(tree_name_node *);
+tree_name_node * get_lowest_tree(tree_name_node *);
+
 void deleteItemNode(tree_name_node*, item_node*);
-void deleteTreeNameNode(tree_name_node*);//TODO
-void deleteAll(tree_name_node*);//TODO
+void deleteTreeNameNode(tree_name_node*, tree_name_node*);
+void deleteAll(tree_name_node*);
 
 #endif //BST_BST_H
