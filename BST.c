@@ -191,34 +191,37 @@ int getCountAux(item_node *node) {
 }
 
 void deleteItemNode(tree_name_node *tree, item_node *node) {
+    deleteItemNodeAux(tree, node, get_item_before(tree->theTree, node));
+}
+
+void deleteItemNodeAux(tree_name_node *tree, item_node *node, item_node *father) {
     item_node *aux;
     if (node == NULL || tree == NULL) {
         return;
     }
     if (item_is_leaf(node)) {
-        item_node *bef = get_item_before(tree->theTree, node);
-        if (bef == NULL) {
+        if (father == NULL) {
             tree->theTree = NULL;
         } else {
-            if (bef->right == node) {
-                bef->right = NULL;
+            if (father->right == node) {
+                father->right = NULL;
             } else {
-                bef->left = NULL;
+                father->left = NULL;
             }
         }
-        node = NULL;
         free(node);
+        node = NULL;
     } else {
         if (node->left != NULL) {
             aux = get_highest(node->left);
             node->count = aux->count;
             strcpy(node->name, aux->name);
-            deleteItemNode(tree, get_highest(node->left));
+            deleteItemNodeAux(tree, get_highest(node->left), father);
         } else {
             aux = get_lowest(node->right);
             node->count = aux->count;
             strcpy(node->name, aux->name);
-            deleteItemNode(tree, get_lowest(node->right));
+            deleteItemNodeAux(tree, get_lowest(node->right), father);
 
         }
     }
@@ -281,7 +284,7 @@ item_node *get_item_before(item_node *root, item_node *node) {
 }
 
 tree_name_node *get_tree_before(tree_name_node *root, tree_name_node *node) {
-    if (node == NULL || node == root) {
+    if (node == NULL || strcmp(node->treeName, root->treeName) == 0) {
         return NULL;
     } else {
         if (root->left == node || root->right == node) {
@@ -297,35 +300,36 @@ tree_name_node *get_tree_before(tree_name_node *root, tree_name_node *node) {
 }
 
 void deleteTreeNameNode(tree_name_node *tree, tree_name_node *node) {
+    deleteTreeNameNodeAux(tree, node, get_tree_before(tree, node));
+}
+
+void deleteTreeNameNodeAux(tree_name_node *tree, tree_name_node *node, tree_name_node *father) {
 
     tree_name_node *aux;
     if (node == NULL) {
         return;
     }
     if (tree_node_is_leaf(node)) {
-
-        tree_name_node *bef = get_tree_before(tree, node);
-        if (bef != NULL) {
-            if (bef->right == node) {
-                bef->right = NULL;
+        if (father != NULL) {
+            if (father->right == node) {
+                father->right = NULL;
             } else {
-                bef->left = NULL;
+                father->left = NULL;
             }
         }
-
 
         while (node->theTree != NULL) {
             deleteItemNode(node, node->theTree);
         }
 
         free(node);
-
+        node = NULL;
     } else {
         if (node->left != NULL) {
             aux = get_highest_tree(node->left);
             node->theTree = aux->theTree;
             strcpy(node->treeName, aux->treeName);
-            deleteTreeNameNode(tree, get_highest_tree(node->left));
+            deleteTreeNameNodeAux(tree, get_highest_tree(node->left), father);
         } else {
             aux = get_lowest_tree(node->right);
             item_node *temp;
@@ -333,13 +337,13 @@ void deleteTreeNameNode(tree_name_node *tree, tree_name_node *node) {
             node->theTree = aux->theTree;
             aux->theTree = temp;
             strcpy(node->treeName, aux->treeName);
-            deleteTreeNameNode(tree, get_lowest_tree(node->right));
+            deleteTreeNameNodeAux(tree, get_lowest_tree(node->right), father);
         }
     }
 }
 
 void deleteAll(tree_name_node *root_tree) {
-    for(int i =0; i < getTreeCount(root_tree); i++){
+    for (int i = 0; i < getTreeCount(root_tree); i++) {
         deleteTreeNameNode(root_tree, root_tree);
     }
 }
@@ -355,6 +359,50 @@ int getTreeCount(tree_name_node *tree) {
         return count;
     }
 }
+
+void traverse_in_order(tree_name_node *root, int counter) {
+    if (root == NULL) {
+        return;
+    } else {
+        traverse_in_order(root->left, 0);
+        fputs(root->treeName, stdout);
+        fputs(" ", stdout);
+        traverse_in_order(root->right, 0);
+    }
+    if(counter == 1){
+        fputs("\n",stdout);
+        print_name_tree_in_order(root);
+    }
+}
+
+void print_tree_in_order(item_node *node) {
+    if (node == NULL) {
+        return;
+    } else {
+        print_tree_in_order(node->left);
+        fputs(node->name, stdout);
+        fputs(" ", stdout);
+        print_tree_in_order(node->right);
+    }
+}
+
+void print_name_tree_in_order(tree_name_node *root) {
+    if(root == NULL){
+        return;
+    }else{
+        print_name_tree_in_order(root->left);
+        fputs("===", stdout);
+        fputs(root->treeName, stdout);
+        fputs("===\n", stdout);
+        print_tree_in_order(root->theTree);
+        fputs("\n",stdout);
+        print_name_tree_in_order(root->right);
+    }
+}
+
+
+
+
 
 
 
